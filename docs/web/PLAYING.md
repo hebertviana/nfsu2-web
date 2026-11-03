@@ -260,7 +260,8 @@ that room.
   apostrophe).
 - **Voices:** Dubbed (the default) plays a language's dubbed voices and movies where the server has them. Original
   plays the game's English ones with that language's text. French, German, Italian and Spanish have no text for the
-  movies' lines, so their English movies play without subtitles.
+  movies' lines, so their English movies play without subtitles. Portuguese's dub, where the server has it, is ZANIT's,
+  made with AI: a server has it only if whoever runs it built it in (`tools/langpacks.py --ptbr-dub`).
 - **Songs:** the EA Trax songs. Uncensored (the default) plays them unedited, some in longer versions than the
   game's, as a soundtrack mod has them. Original plays the versions the game
   shipped with, where the server has them. F7 skips to the next song while you play.

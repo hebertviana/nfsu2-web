@@ -243,6 +243,7 @@ export const TEMPLATE = `# NFSU2 settings, read at every launch.
 
 # Voices and movies: dubbed = in your language where it has a dub on the
 # server; original = the game's English ones, with your language's text.
+# Portuguese's dub is made with AI.
 # [NFSU2_VOICES]
 #voices = dubbed
 

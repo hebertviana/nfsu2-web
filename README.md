@@ -69,7 +69,7 @@ top), the static recompilation of NFSU2 for Apple Silicon, which in turn follows
 [N64: Recompiled](https://github.com/N64Recomp/N64Recomp) and [XenonRecomp](https://github.com/hedge-dev/XenonRecomp).
 The language packs are built from KyoriAsh's [Multi 13 languages mod](https://nfsmods.xyz/mod/5749) (with Lee-Ryo's
 Thai support, whose patch `runtime/language.c` follows), from TraduMix's and MixMods' Brazilian Portuguese
-translation (Fyro, Beater, Kerlyston F.; Junior_Djjr, SideWinder, Elyzandro), from PLProjekt's Polish translation
+translation (Fyro, Beater, Kerlyston F.; Junior_Djjr, SideWinder, Elyzandro) (and, where a server builds it in, ZANIT's AI-made dub), from PLProjekt's Polish translation
 (Daniel Graszka, MaDeR, Marcin Piech, Nati, Mateusz Wilkowski, alter), from VileStuff's
 [English Subtitles Fixed](https://nfsmods.xyz/mod/5286), from muntazam's
 [Turkish translation](https://www.moddb.com/mods/need-for-speed-underground-2-turkish-translation-patch) (its fonts), from

@@ -70,7 +70,7 @@ import { keepPageId, PAGE_ID_FILE, pageId, seen } from './page-id';
 import { NameClaims, onlineName } from './claim';
 import { claimQuietly, NameRow, quietCheck, renamePick, settleName, type PlayNameDeps } from './claim-ui';
 import { RenderCheck, RENDER_CHECK_TIMES, type RenderCheckTimes } from './rendercheck';
-import { moviesKept, Predownload } from './predownload';
+import { moviesKept, portugueseDub, Predownload } from './predownload';
 import { movieCodec } from '../host/movie';
 import type { Packs } from '../host/datacache';
 import { texSplit } from '../gpu/index';
@@ -2002,6 +2002,7 @@ export async function boot() {
   panelTabs($('#about'));
   settings = new SettingsPanel($('#settings'), {
     // another language, texture pack or songs count other files as the game data (its pack); a keyphrase sends the file
+    portugueseDub: () => portugueseDub().catch(() => false),
     saveDir: SAVE, environment: ENVIRONMENT, defaults: DEVICE, onSaved: text => {
       const was = packsKey(); settingsText = text;
       if (packsKey() !== was) void saves.refresh();

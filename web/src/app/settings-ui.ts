@@ -367,7 +367,12 @@ export function resetLine(text: string, phys: number): string {
   return lines.join('\n');
 }
 
+/** The Voices row's help in Portuguese, on a server with its dub (tools/langpacks.py --ptbr-dub) */
+const VOICES_PT_DUB = N('Dubbed: Brazilian Portuguese voices and movies, ZANIT\'s dub, made with AI. Original: English voices and movies, with the Portuguese text.');
+
 export interface SettingsDeps {
+  /** whether this server has Portuguese's dub */
+  portugueseDub?: () => Promise<boolean>;
   saveDir: string;
   /** the page address's environment (overrides the file) */
   environment: Record<string, string>;
@@ -399,7 +404,10 @@ export class SettingsPanel {
   private crewDraft = '';                  // the crew name being typed, kept across re-renders
   private phrasesOpen = false;             // Your phrases' Choose phrases open, kept across re-renders
   /** root: the big panel, every tab of it (index.html #settings); online: its Online tab (#online) */
+  private ptDub = false;
+
   constructor(private root: HTMLElement, private deps: SettingsDeps, private online: HTMLElement) {
+    void deps.portugueseDub?.().then(has => { this.ptDub = has; if (has && this.find('.set[data-key="voices"]')) this.rerow('voices'); });
     root.querySelector<HTMLButtonElement>('#settings-text-save')!.onclick = () => void this.saveRaw();
     root.querySelector<HTMLButtonElement>('#settings-reset-all')!.onclick = () => void this.resetAll();
   }
@@ -454,6 +462,7 @@ export class SettingsPanel {
     this.resolve(next);
     this.deps.onSaved?.(next);
     if (removed) this.render(); else { this.rerow(key); this.syncRaw(); }
+    if (key === 'language' && !removed) this.rerow('voices');
     // (the Room and Crews rows say whether free roam is on)
     if (key === 'roam' && !removed) for (const k of ROAM_ROWS) this.rerow(k);
     this.root.dataset.saved = String(++this.saves);
@@ -600,7 +609,7 @@ export class SettingsPanel {
     if (label instanceof HTMLLabelElement) label.htmlFor = id;
     const help = document.createElement('p'); help.className = 'set-help'; help.id = `${id}-help`;
     // each link on its words where they first stand in the help (in this language's text), in their order there
-    const helpText = t(it.help);
+    const helpText = t(it.key === 'voices' && this.ptDub && this.current('language').toLowerCase() === 'portuguese' ? VOICES_PT_DUB : it.help);
     const links = (it.link ? Array.isArray(it.link) ? it.link : [it.link] : [])
       .map(l => ({ href: l.href, text: t(l.text), at: helpText.indexOf(t(l.text)) })).filter(l => l.text && l.at >= 0)
       .sort((x, y) => x.at - y.at);

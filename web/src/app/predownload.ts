@@ -28,6 +28,13 @@ export async function moviesKept(language: string, av1: boolean, voices: string)
   return s.have >= s.total;
 }
 
+/** Whether this server's folder has Portuguese's dub (tools/langpacks.py --ptbr-dub) */
+export async function portugueseDub(): Promise<boolean> {
+  const r = await fetch(MANIFEST_URL, { cache: 'no-cache' });
+  if (!r.ok) return false;
+  return manifestFiles(await r.json() as Manifest).some(f => f.path.toLowerCase() === 'langpacks/portuguese/speech/ug2_speech.big');
+}
+
 /** How much of what the download fetches (all but the movies) this browser keeps: bytes in the cache, of their total. */
 export async function gameDataKept(language: string, packs: Packs): Promise<{ have: number; total: number }> {
   const r = await fetch(MANIFEST_URL, { cache: 'no-cache' });
