@@ -161,6 +161,8 @@ export const KEYS: readonly KeyDef[] = [
   // reads in their place (pfdata/original: io-worker.ts dataFile; the page fetches ahead only the ones picked:
   // datacache.ts).  Not in bundle.m's table either
   { key: 'songs', env: 'NFSU2_SONGS', kind: 'enum', vals: 'uncensored|original', scope: 'web' },
+  // a language pack's speech and movies, or the game folder's English ones (runtime/fileio.c, datacache.ts)
+  { key: 'voices', env: 'NFSU2_VOICES', kind: 'enum', vals: 'dubbed|original', scope: 'web' },
   // the player's horn, which the others hear too (runtime/horn.c).  Not in bundle.m's table either: NFSU2_HORN there
   { key: 'horn', env: 'NFSU2_HORN', kind: 'enum', vals: HORNS.join('|'), scope: 'web' },
   // the menus', HUD's and maps' textures: texture packs in place of the game's (runtime/web/texrep_web.c; the page
@@ -238,6 +240,11 @@ export const TEMPLATE = `# NFSU2 settings, read at every launch.
 # with, where the server has them.  F7 plays the next song while you play.
 # [NFSU2_SONGS]
 #songs = uncensored
+
+# Voices and movies: dubbed = in your language where it has a dub on the
+# server; original = the game's English ones, with your language's text.
+# [NFSU2_VOICES]
+#voices = dubbed
 
 # Sound output.  [NOSOUND, inverted]
 #sound = on

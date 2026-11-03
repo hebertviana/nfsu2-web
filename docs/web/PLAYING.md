@@ -237,7 +237,7 @@ that room.
 |---|---|
 | Online | free roam with others, your name (in free roam and online), your horn, room, ghost mode (off, players or everything), players' cars shown (16, 24, 32, 40 or 48; computers start at 32, phones at 16, tablets at 24), quick chat and your phrases; more: the game's Online mode (on by default) |
 | Friends & crews | crews (with their colours), and your friends (once your name is claimed) |
-| Game, Game | language, movies, subtitles, songs (uncensored or original), autosave; more: show hidden races, startup movies (skippable, original or off), sound, pause or keep running in the background, sound output latency, highest graphics for a new save |
+| Game, Game | language, movies, subtitles, songs (uncensored or original), voices (dubbed or original), autosave; more: show hidden races, startup movies (skippable, original or off), sound, pause or keep running in the background, sound output latency, highest graphics for a new save |
 | Game, Display | full screen on Play (off: the game plays in the browser window; on by default on phones), resolution scale (phones start at 75%, 100% once one shows it has the room), frame rate (auto follows the screen: 120 on a 120 Hz display, 240 on a 240 Hz one; 30, 60, 120 or 240, where 30 keeps a phone that cannot hold 60 steady; Online and LAN races at most 120); more: menus, HUD and maps (original or upscaled), HUD layout (wide, or 4:3 as phones start), movie framing, cutscene bars, 3D proportions (original, as the game drew them about 10 % too wide, or corrected: round wheels, a little more at the sides), other cars' headlights (players, all cars, off), frame-rate counter, fixed render size, pixel limit |
 | Controls, Controller | rumble; more: controller (on, hotplug or off), menu buttons, dead zones, trigger full press |
 
@@ -258,6 +258,9 @@ that room.
   [English Subtitles Fixed](https://nfsmods.xyz/mod/5286), with who says each line, where the server has its
   language pack (without it English has none: the game's own English lines stop at their first
   apostrophe).
+- **Voices:** Dubbed (the default) plays a language's dubbed voices and movies where the server has them. Original
+  plays the game's English ones with that language's text. French, German, Italian and Spanish have no text for the
+  movies' lines, so their English movies play without subtitles.
 - **Songs:** the EA Trax songs. Uncensored (the default) plays them unedited, some in longer versions than the
   game's, as a soundtrack mod has them. Original plays the versions the game
   shipped with, where the server has them. F7 skips to the next song while you play.

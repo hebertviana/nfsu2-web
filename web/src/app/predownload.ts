@@ -21,10 +21,10 @@ const STOP_WAIT_MS = 3000;
 
 /** Whether every movie a game in this language can play is in this browser's cache (they are not downloaded ahead:
  *  only one that played is), in VP6 or, where the browser plays them in AV1 (av1), their AV1 copies. */
-export async function moviesKept(language: string, av1: boolean): Promise<boolean> {
+export async function moviesKept(language: string, av1: boolean, voices: string): Promise<boolean> {
   const r = await fetch(MANIFEST_URL, { cache: 'no-cache' });
   if (!r.ok) return false;
-  const s = await scanCache(languageMovies(manifestFiles(await r.json() as Manifest), language, av1));
+  const s = await scanCache(languageMovies(manifestFiles(await r.json() as Manifest), language, av1, voices));
   return s.have >= s.total;
 }
 
