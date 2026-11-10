@@ -45,9 +45,10 @@ const parts = (f: DataFile) => f.path.toLowerCase().split('/');
 /** The data the settings pick: a texture pack (TEXPACKS/<name>.pak, runtime/web/texrep_web.c; '' for none), the
  *  songs (settings.ini songs: 'original' reads pfdata/original's files in place of pfdata's, songsPath), the crash
  *  damage's scratches (MODPACKS/DAMAGE/, runtime/damage.c, which opens them only with crash_damage on) and the
- *  gearbox whine's sounds (MODPACKS/WHINE, runtime/whine.c: read only with gearbox_whine on). */
-export interface Packs { texpack: string; songs: string; damage?: boolean; whine?: boolean }
-export const NO_PACKS: Packs = { texpack: '', songs: '' };
+ *  gearbox whine's sounds (MODPACKS/WHINE, runtime/whine.c: read only with gearbox_whine on), and the voices (settings.ini
+ *  voices: 'original' leaves out a language pack's speech and movies, as runtime/fileio.c does). */
+export interface Packs { texpack: string; songs: string; voices: string; damage?: boolean; whine?: boolean }
+export const NO_PACKS: Packs = { texpack: '', songs: '', voices: '' };
 /** EA's own songs (tools/musicpack.py --original) for a file of pfdata: pfdata/<name> -> pfdata/original/<name>; null
  *  for any other path.  The folder's own are a soundtrack mod's uncensored versions. */
 export function songsPath(path: string): string | null {
@@ -58,10 +59,12 @@ export function songsPath(path: string): string | null {
  *  runtime/language.c) has a file of the same path, that one; no other language's pack; of the texture packs
  *  (TEXPACKS/<name>.pak and its <name>.tracks, runtime/web/texrep_web.c) only those picked (packs.texpack: their
  *  names, comma-separated; '' for none); pfdata/original's files only with the original songs, and then in place
- *  of pfdata's; the crash damage's (MODPACKS/DAMAGE/) only with it on, and MODPACKS/WHINE only with the gearbox whine on.
+ *  of pfdata's; the crash damage's (MODPACKS/DAMAGE/) only with it on, and MODPACKS/WHINE only with the gearbox whine on;
+ *  with the original voices, the folder's speech and movies in place of the language pack's.
  *  HQVINYLS/ never: the HQ vinyls' pictures (gpu/hqskin.ts) are read as cars are seen, 330 MB in all. */
 function gameFiles(files: DataFile[], language: string, packs: Packs): DataFile[] {
-  const own = new Set(files.filter(f => { const p = parts(f); return p[0] === 'langpacks' && p[1] === language; })
+  const usedPack = (p: string[]) => p[1] === language && !(packs.voices === 'original' && (p[2] === 'speech' || p[2] === 'movies'));
+  const own = new Set(files.filter(f => { const p = parts(f); return p[0] === 'langpacks' && usedPack(p); })
     .map(f => parts(f).slice(2).join('/')));
   const isOriginal = (p: string[]) => p.length === 3 && p[0] === 'pfdata' && p[1] === 'original';
   const original = packs.songs === 'original';
@@ -74,7 +77,7 @@ function gameFiles(files: DataFile[], language: string, packs: Packs): DataFile[
     if (p[0] === 'hqvinyls') return false;
     if (isOriginal(p)) return original;
     if (replaced.has(p.join('/'))) return false;
-    return p[0] === 'langpacks' ? p[1] === language : !own.has(p.join('/'));
+    return p[0] === 'langpacks' ? usedPack(p) : !own.has(p.join('/'));
   });
 }
 const isMovie = (f: DataFile) => { const p = parts(f); return (p[0] === 'langpacks' ? p[2] : p[0]) === 'movies'; };
@@ -92,8 +95,8 @@ export const aheadFiles = (files: DataFile[], language: string, packs: Packs = N
   gameFiles(files, language, packs).filter(f => !isMovie(f));
 /** The movies a game in this language can open: its VP6 files, or where it plays AV1 (av1) their AV1 copies, the
  *  VP6 file where a movie has none (as the I/O worker opens them, io-worker.ts dataFile). */
-export function languageMovies(files: DataFile[], language: string, av1 = false): DataFile[] {
-  const all = gameFiles(files, language, NO_PACKS).filter(isMovie), byPath = new Map(all.map(f => [f.path.toLowerCase(), f]));
+export function languageMovies(files: DataFile[], language: string, av1 = false, voices = ''): DataFile[] {
+  const all = gameFiles(files, language, { ...NO_PACKS, voices }).filter(isMovie), byPath = new Map(all.map(f => [f.path.toLowerCase(), f]));
   return all.filter(f => av1Path(f.path) !== null).map(f => (av1 && byPath.get(av1Path(f.path)!.toLowerCase())) || f);
 }
 export const dataUrl = (base: string, path: string) => base + path.split('/').map(encodeURIComponent).join('/');

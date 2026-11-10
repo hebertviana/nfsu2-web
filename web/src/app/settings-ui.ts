@@ -125,6 +125,7 @@ const GROUPS: Group[] = [
   { title: N('Game'), more: N('More game settings'), items: [
     { key: 'language', label: N('Language'), help: N('Menus, subtitles, dubbed voices and this page.'), c: { t: 'select', opts: LANGUAGE_OPTS } },
     { key: 'movies', label: N('Movies'), help: N('Intro and story movies.'), c: { t: 'switch' } },
+    { key: 'voices', label: N('Voices'), help: N('Dubbed: voices and movies in your language where it has a dub. Original: English voices and movies, with your language\'s text.'), c: { t: 'seg', opts: [['dubbed', N('Dubbed')], ['original', N('Original')]] } },
     { key: 'race_music', label: N('Music in drag and drift races'), help: N('The songs play there too, as in the other races. Off: none there, as in the original, so you hear the engine.'), c: { t: 'switch' } },
     { key: 'autosave', label: N('Autosave'), help: N('Sets each profile\'s Save option to Autosave once. A later change in the game\'s Options stays.'), c: { t: 'switch' } },
     { key: 'intro', label: N('Startup movies'), help: N('Logos, PSA and intro. Skippable: Enter, Esc, Space, a click, A, B or Start skips each. Original: only the intro can be skipped.'), c: { t: 'seg', opts: [['skippable', N('Skippable')], ['original', N('Original')], ['off', N('Off')]] }, more: true },
@@ -392,9 +393,14 @@ function shown(it: Item, v: string): string {
   return c.t === 'num' && c.unit ? `${v} ${c.unit}` : v;
 }
 
+/** The Voices row's help in Portuguese, on a server with its dub (tools/langpacks.py --ptbr-dub) */
+const VOICES_PT_DUB = N('Dubbed: Brazilian Portuguese voices and movies, ZANIT\'s dub, made with AI. Original: English voices and movies, with the Portuguese text.');
+
 export interface SettingsDeps {
   /** settings.ini (the panel reads and writes it there) */
   file: SettingsFile;
+  /** whether this server has Portuguese's dub */
+  portugueseDub?: () => Promise<boolean>;
   /** the page address's environment (overrides the file) */
   environment: Record<string, string>;
   /** keys whose default is another on this device (device.ts), shown when the file does not set them */
@@ -433,7 +439,10 @@ export class SettingsPanel {
   private country: FlagCode | '' = '';     // the country this connection comes from (/country), first in Your flag's list
   private countryAsked = false;
   /** root: the big panel, every tab of it (index.html #settings); online: its Online tab (#online) */
+  private ptDub = false;
+
   constructor(private root: HTMLElement, private deps: SettingsDeps, private online: HTMLElement) {
+    void deps.portugueseDub?.().then(has => { this.ptDub = has; if (has && this.find('.set[data-key="voices"]')) this.rerow('voices'); });
     root.querySelector<HTMLButtonElement>('#settings-text-save')!.onclick = () => void this.saveRaw();
     root.querySelector<HTMLButtonElement>('#settings-reset-all')!.onclick = () => void this.resetAll();
   }
@@ -501,6 +510,7 @@ export class SettingsPanel {
     // (our controls' rows are the Site tab's, which draws them again itself: sitekeys.ts)
     const site = SITE_KEYS.includes(key);
     if (removed) this.render(); else { if (!site) this.rerow(key); this.syncRaw(); }
+    if (key === 'language' && !removed) this.rerow('voices');
     // (the World and Crews rows say whether free roam is on; Ghost mode whether the world keeps it off)
     if (key === 'roam' && !removed) for (const k of ROAM_ROWS) this.rerow(k);
     if ((key === 'roam' || key === 'roam_room') && !removed) this.rerow('roam_collide');
@@ -663,7 +673,7 @@ export class SettingsPanel {
     const help = document.createElement('p'); help.className = 'set-help'; help.id = `${id}-help`;
     // each link on its words where they first stand in the help (in this language's text), in their order there
     const devOpt = it.deviceOpt && this.deps.defaults?.[it.key] === it.deviceOpt.value ? it.deviceOpt : undefined;
-    const helpText = it.mod ? rowHelp(it.mod) : t(devOpt ? devOpt.help : it.help);
+    const helpText = it.mod ? rowHelp(it.mod) : t(it.key === 'voices' && this.ptDub && this.current('language').toLowerCase() === 'portuguese' ? VOICES_PT_DUB : devOpt ? devOpt.help : it.help);
     const links = (it.link ? Array.isArray(it.link) ? it.link : [it.link] : [])
       .map(l => ({ href: l.href, text: t(l.text), at: helpText.indexOf(t(l.text)) })).filter(l => l.text && l.at >= 0)
       .sort((x, y) => x.at - y.at);

@@ -9,7 +9,7 @@ Hungarian one, from Clark X.'s Ukrainian one, from ROXOR's and PINĎA & syn's Cz
 tools/greekfont/build_greek.py makes (tools/lang/greek.json's texts).
 
     tools/langpacks.py <game folder> [--multi13 <mod folder>] [--ptbr <translation folder>]
-                       [--pl <installer>] [--subs <subtitles folder>] [--tr <translation folder>]
+                       [--ptbr-dub <dub folder>] [--pl <installer>] [--subs <subtitles folder>] [--tr <translation folder>]
                        [--hu <installer>] [--uk <translation folder>] [--cz <installer>]
                        [--sk <translation folder>] [--el <Greek pack folder>]
 
@@ -47,8 +47,9 @@ V1.1 from joao13traducoes.com, password "João13", differs in one text), or any
 folder below which it has LANGUAGES/English.bin.  Portuguese takes English's
 place as Russian does: its text (accented in the game's own fonts) and
 credits, and the game folder's own Brazilian Portuguese memory-card texts
-("Carregado." for "Load complete.").  The page's AI dub is not used, nor
-joao13's Extra Options mod (for its ShowSubs: the port shows the subtitles
+("Carregado." for "Load complete.").  The AI dub (ZANIT, v1.0, 2024, from the
+same pages: speech/UG2_Speech.*, MOVIES/*.vp6) is used only with --ptbr-dub
+<dub folder>, which needs --ptbr too.  Not used: joao13's Extra Options mod (for its ShowSubs: the port shows the subtitles
 itself, runtime/language.c).
 
 <installer> is either installer of the Polish translation (v1.1, 2009,
@@ -338,7 +339,18 @@ def multi13(mod, game):
         done(p, lang)
 
 
-def ptbr(src, game):
+def ptbr_dub(src):
+    """the AI dub's files as (path, the pack's name for it), all there or stops: a pack is rewritten as a whole"""
+    root = next((d for d, _, _ in os.walk(src) if find(d, 'speech/UG2_Speech.big')), None)
+    if not root or not find(root, 'speech/UG2_Speech.idx'): sys.exit(f'{src}: no speech/UG2_Speech.big and .idx below it, not the dub')
+    mdir = find(root, 'MOVIES')
+    movies = sorted(n for n in os.listdir(mdir) if n.lower().endswith('.vp6')) if mdir else []
+    if not movies: sys.exit(f'{root}: no MOVIES/*.vp6, the dub is not all there')
+    return [(find(root, f'speech/UG2_Speech.{x}'), f'speech/UG2_Speech.{x}') for x in ('big', 'idx')] + [(os.path.join(mdir, n), f'MOVIES/{n}') for n in movies]
+
+
+def ptbr(src, game, dub=None):
+    dubbed = ptbr_dub(dub) if dub else []
     root = next((d for d, _, _ in os.walk(src) if find(d, 'LANGUAGES/English.bin')), None)
     if not root: sys.exit(f'{src}: no LANGUAGES/English.bin below it, not the translation')
     missing = [s for s, _ in PTBR if not find(root, s)]
@@ -349,6 +361,7 @@ def ptbr(src, game):
     for s, rel in PTBR: p.add_file(find(root, s), rel)
     loc = find(game, 'memcard/LOCALE_BRAZILIAN_PORTUGUESE.loc')
     if loc: p.add_file(loc, 'memcard/LOCALE_ENGLISH.loc')
+    for s, rel in dubbed: p.add_file(s, rel)
     done(p, 'portuguese')
 
 
@@ -750,10 +763,11 @@ def subs(src, game):
 
 
 def main():
-    ap = argparse.ArgumentParser(usage='tools/langpacks.py <game folder> [--multi13 <mod folder>] [--ptbr <translation folder>] [--pl <installer>] [--subs <subtitles folder>] [--tr <translation folder>] [--hu <installer>] [--uk <translation folder>] [--cz <installer>] [--sk <translation folder>] [--el <Greek pack folder>]')
+    ap = argparse.ArgumentParser(usage='tools/langpacks.py <game folder> [--multi13 <mod folder>] [--ptbr <translation folder>] [--ptbr-dub <dub folder>] [--pl <installer>] [--subs <subtitles folder>] [--tr <translation folder>] [--hu <installer>] [--uk <translation folder>] [--cz <installer>] [--sk <translation folder>] [--el <Greek pack folder>]')
     ap.add_argument('game')
     ap.add_argument('--multi13', metavar='MOD', help='the Multi 13 languages mod, every archive extracted')
     ap.add_argument('--ptbr', metavar='FOLDER', help='the Brazilian Portuguese translation, extracted')
+    ap.add_argument('--ptbr-dub', metavar='FOLDER', help='the Brazilian Portuguese AI dub (ZANIT), extracted; needs --ptbr')
     ap.add_argument('--pl', metavar='INSTALLER', help='the Polish translation\'s installer (or its folder), never run')
     ap.add_argument('--subs', metavar='FOLDER', help='the English Subtitles Fixed mod, extracted')
     ap.add_argument('--tr', metavar='FOLDER', help='the Turkish translation, its installer extracted (innoextract), never run')
@@ -763,10 +777,11 @@ def main():
     ap.add_argument('--sk', metavar='FOLDER', help='the Slovak translation, its installer extracted (7z x), never run')
     ap.add_argument('--el', metavar='FOLDER', help='the Greek pack tools/greekfont/build_greek.py made (its LANGPACKS/greek)')
     a = ap.parse_args()
+    if a.ptbr_dub and not a.ptbr: ap.error('--ptbr-dub needs --ptbr: each run writes the whole Portuguese pack')
     if not (a.multi13 or a.ptbr or a.pl or a.subs or a.tr or a.hu or a.uk or a.cz or a.sk or a.el): sys.exit(__doc__)
     if not find(a.game, 'SPEED2.EXE'): sys.exit(f'{a.game}: no SPEED2.EXE, not the game folder')
     if a.multi13: multi13(a.multi13, a.game)
-    if a.ptbr: ptbr(a.ptbr, a.game)
+    if a.ptbr: ptbr(a.ptbr, a.game, a.ptbr_dub)
     if a.pl: pl(a.pl, a.game)
     if a.subs: subs(a.subs, a.game)
     if a.tr: tr(a.tr, a.game)

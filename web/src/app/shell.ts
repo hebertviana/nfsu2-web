@@ -79,7 +79,7 @@ import { keepPageId, PAGE_ID_FILE, pageId, seen } from './page-id';
 import { digitsFor, NameClaims, onlineName, readsAsSlur } from './claim';
 import { claimQuietly, NameRow, quietCheck, renamePick, settleName, type PlayNameDeps } from './claim-ui';
 import { RenderCheck, RENDER_CHECK_TIMES, type RenderCheckTimes } from './rendercheck';
-import { moviesKept, Predownload } from './predownload';
+import { moviesKept, portugueseDub, Predownload } from './predownload';
 import { movieCodec } from '../host/movie';
 import type { Packs } from '../host/datacache';
 import type { GameMemory } from '../host/memory';
@@ -333,9 +333,9 @@ const texpack = (r: Resolved = resolved()) => [uiPack(r.env.NFSU2_UI_TEXTURES), 
 /** the data the settings pick (datacache.ts Packs): the texture pack, the songs (EA's own: io-worker.ts dataFile), the
  *  crash damage's scratches and the gearbox whine's sounds (runtime/damage.c, runtime/whine.c: each read only with its
  *  switch on) */
-const packs = (r: Resolved = resolved()): Packs => ({ texpack: texpack(r), songs: (r.env.NFSU2_SONGS ?? '').trim().toLowerCase(),
+const packs = (r: Resolved = resolved()): Packs => ({ texpack: texpack(r), songs: (r.env.NFSU2_SONGS ?? '').trim().toLowerCase(), voices: (r.env.NFSU2_VOICES ?? '').trim().toLowerCase(),
   damage: r.env.NFSU2_DAMAGE === '1', whine: r.env.NFSU2_GEARBOX_WHINE === '1' });
-const packsKey = (r: Resolved = resolved()) => { const p = packs(r); return `${language(r)}/${p.texpack}/${p.songs}/${p.damage ? 1 : 0}/${p.whine ? 1 : 0}`; };
+const packsKey = (r: Resolved = resolved()) => { const p = packs(r); return `${language(r)}/${p.texpack}/${p.songs}/${p.voices}/${p.damage ? 1 : 0}/${p.whine ? 1 : 0}`; };
 
 // ----------------------------------------------------------------- play --
 function stageCanvas(): HTMLCanvasElement {
@@ -703,7 +703,7 @@ async function startGame() {
   let offlineNote = '';
   if (offline) {
     log.add('[app] offline: the server does not answer, the game runs from this PC (no free roam or Online)');
-    if (r.env.NOMOVIES !== '1' && !await moviesKept(language(r), r.env.NFSU2_MOVIE_CODEC === 'av1').catch(() => false)) {
+    if (r.env.NOMOVIES !== '1' && !await moviesKept(language(r), r.env.NFSU2_MOVIE_CODEC === 'av1', packs(r).voices).catch(() => false)) {
       r.env.NOMOVIES = '1';
       log.add('[app] offline: not every movie is on this PC, so the movies are off for this game');
       offlineNote = t('No connection to the server: the movies are off for this game.') + ' ';
@@ -2590,7 +2590,7 @@ export async function boot() {
   onLanguage(() => lastfmRow.render());
   settings = new SettingsPanel($('#settings'), {
     // another language, texture pack or songs count other files as the game data (its pack); a keyphrase sends the file
-    file: settingsFile, environment: ENVIRONMENT, defaults: DEVICE, onSaved: (_, was) => {
+    file: settingsFile, environment: ENVIRONMENT, defaults: DEVICE, portugueseDub: () => portugueseDub().catch(() => false), onSaved: (_, was) => {
       if (packsKey() !== packsKey(resolveEnv(was, ENVIRONMENT, {}, DEVICE))) void saves.refresh();
       vault?.changed(); players?.now();
       friendsPanel?.render();

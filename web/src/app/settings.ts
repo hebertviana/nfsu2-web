@@ -174,6 +174,8 @@ export const KEYS: readonly KeyDef[] = [
   // the songs in drag and drift races too (runtime/drift.c race_music; off: none there, as in the original).  Not in
   // bundle.m's table: there a lower-case key, so it reaches the runtime as NFSU2_RACE_MUSIC all the same
   { key: 'race_music', env: 'NFSU2_RACE_MUSIC', kind: 'bool', scope: 'web' },
+  // a language pack's speech and movies, or the game folder's English ones (runtime/fileio.c, datacache.ts)
+  { key: 'voices', env: 'NFSU2_VOICES', kind: 'enum', vals: 'dubbed|original', scope: 'web' },
   // the player's horn, which the others hear too (runtime/horn.c).  Not in bundle.m's table either: NFSU2_HORN there
   { key: 'horn', env: 'NFSU2_HORN', kind: 'enum', vals: HORNS.join('|'), scope: 'web' },
   // the menus', HUD's and maps' textures: texture packs in place of the game's (runtime/web/texrep_web.c; the page
@@ -330,6 +332,11 @@ export const TEMPLATE = `# NFSU2 settings, read at every launch.
 # off = as in the original game, which has none there, so you hear the
 # engine for shifting.  [NFSU2_RACE_MUSIC]
 #race_music = off
+# Voices and movies: dubbed = in your language where it has a dub on the
+# server; original = the game's English ones, with your language's text.
+# Portuguese's dub is made with AI.
+# [NFSU2_VOICES]
+#voices = dubbed
 
 # Sound output.  [NOSOUND, inverted]
 #sound = on

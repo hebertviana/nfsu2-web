@@ -184,6 +184,7 @@ static char g_lroot[1024];
 struct lfile { char *key, *rel; };
 struct flist { struct lfile *f; int n, cap; };        /* sorted by key: the path lower-cased */
 static struct flist g_lp;
+static int g_voices_original;      /* NFSU2_VOICES = original: the pack's speech and movies are left out */
 static int lfile_cmp(const void *a, const void *b){
     return strcmp(((const struct lfile *)a)->key, ((const struct lfile *)b)->key);
 }
@@ -198,6 +199,7 @@ static void lpack_walk(struct flist *l, const char *dir, const char *rel){
         if (stat(p, &st) != 0) continue;
         if (S_ISDIR(st.st_mode)){ lpack_walk(l, p, r); continue; }
         if (!S_ISREG(st.st_mode)) continue;
+        if (g_voices_original && (!strncasecmp(r, "speech/", 7) || !strncasecmp(r, "movies/", 7))) continue;
         if (l->n == l->cap){
             l->cap = l->cap ? 2*l->cap : 64;
             struct lfile *nf = realloc(l->f, (size_t)l->cap * sizeof *l->f); if (!nf) break;
@@ -218,6 +220,8 @@ static const struct lfile *flist_find(const struct flist *l, const char *win){
 }
 /* -> how many files the pack has (0: none, or no such folder) */
 int fileio_set_language_pack(const char *rel){
+    const char *v = getenv("NFSU2_VOICES");
+    g_voices_original = v && !strcasecmp(v, "original");
     if (!resolve_in(g_root, rel, g_lroot, sizeof g_lroot)) return 0;
     lpack_walk(&g_lp, g_lroot, "");
     qsort(g_lp.f, (size_t)g_lp.n, sizeof *g_lp.f, lfile_cmp);

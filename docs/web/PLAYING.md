@@ -294,7 +294,7 @@ World row's list says how many are in each world.
 |---|---|
 | Online | free roam with others, your name (in free roam and online), your flag, license plate (up to 8 letters and digits on your car, also for other players in free roam), your horn, world (Main world, World 1 to 4, or a name of your own), blocked players; more: ghost mode (off, players or everything), players' cars shown (16, 24, 32, 48 or 64, and on a computer Auto, its default: 32, more while the frame rate allows; phones start at 16, tablets at 24), quick chat and your phrases, the game's Online mode (on by default) |
 | Friends & crews | crews (with their colours), and your friends (once your name is claimed) |
-| Game, Game | language, movies, music in drag and drift races, autosave; more: startup movies (skippable, original or off), sound, pause or keep running in the background, sound output latency, highest graphics for a new save |
+| Game, Game | language, movies, voices (dubbed or original), music in drag and drift races, autosave; more: startup movies (skippable, original or off), sound, pause or keep running in the background, sound output latency, highest graphics for a new save |
 | Game, Display | full screen on Play (off: the game plays in the browser window; on by default on phones), resolution scale (phones start at 75%, 100% once one shows it has the room), frame rate (auto picks 30, 60, 120 or 240 from the screen: 120 from 119 Hz, 240 from 239 Hz, otherwise 60, so a 75 Hz or 144 Hz screen gets 60 or 120; or 30, 60, 120 or 240, where 30 keeps a phone that cannot hold 60 steady; Online and LAN races at most 120); more: pixelated textures (off), HUD layout (wide, or 4:3 as phones start), movie framing, cutscene bars, 3D proportions (original, as the game drew them about 10 % too wide, or corrected: round wheels, a little more at the sides), other cars' headlights (players, all cars, off), frame-rate counter, fixed render size, pixel limit |
 | Mods | the mods built in, with their makers (the (i) after a row's name says what it does, who sees it, where it is set and its pages), and the settings of those that have one: Upscaled HUD and Detailed Map (original, map only or upscaled), English Subtitles Fixed (the subtitles), Uncensored & Restored Soundtrack (the songs: uncensored or original), GPS Distance, Show Hidden Races, Visual Reputation Remover, Mods on other cars (shown or original), Stance, Crash Damage, Rubberbanding (original, no boost or off), Transmission Whine, HQ Vinyls & Doorlines; and our changes from the original game, a row per group (Driving, Free roam, Photos and screen, Career and garage, Controls, Saves), whose (i) lists them all |
 | Controls, Controller | rumble; more: controller (on, hotplug or off), menu buttons, dead zones, trigger full press |
@@ -314,6 +314,10 @@ World row's list says how many are in each world.
   pick another.
   Its problems and errors carry a short code (`GPU-ADAPTER-WIN`), the same in every language, to quote when you ask
   for help; the log stays English.
+- **Voices** (Game): Dubbed (the default) plays a language's dubbed voices and movies where the server has them. Original
+  plays the game's English ones with that language's text. French, German, Italian and Spanish have no text for the
+  movies' lines, so their English movies play without subtitles. Portuguese's dub, where the server has it, is ZANIT's,
+  made with AI: a server has it only if whoever runs it built it in (`tools/langpacks.py --ptbr-dub`).
 - **Mods:** the Mods tab lists the community mods this game carries, under On your screen, Seen by others and Game
   rules, each with its makers as its mod page names them, then Our changes, where this site differs from the original
   game. A row with a setting has its switch or choice. The (i) after a row's name opens what the mod does, who sees it,
